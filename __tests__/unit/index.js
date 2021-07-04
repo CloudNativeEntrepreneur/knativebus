@@ -3,12 +3,10 @@ import { knativebus } from 'index'
 jest.mock('axios')
 
 describe('knativebus', () => {
-
   describe('send', () => {
-
     afterEach(() => {
-      jest.clearAllMocks();
-    });
+      jest.clearAllMocks()
+    })
 
     it('should expose a send function once initialized', () => {
       const bus = knativebus({})
@@ -84,14 +82,13 @@ describe('knativebus', () => {
   })
 
   describe('publish', () => {
-
     afterEach(() => {
-      jest.clearAllMocks();
-    });
+      jest.clearAllMocks()
+    })
 
     it('should expose a publish function once initialized', () => {
       const bus = knativebus({})
-  
+
       expect(bus.publish).toBeDefined()
       expect(typeof bus.publish === 'function').toBe(true)
     })
@@ -124,20 +121,20 @@ describe('knativebus', () => {
         },
         source: 'example-aggregate-model-tests'
       })
-  
+
       const axios = require('axios')
-  
+
       const event = 'example-aggregate.event-happened'
       const data = { id: 1 }
-  
+
       try {
         bus.publish(event, data)
       } catch (e) {
-        expect(e).toEqual(new Error(`channel url has not been configured for example-aggregate`))
+        expect(e).toEqual(new Error('channel url has not been configured for example-aggregate'))
       }
       expect(axios).not.toBeCalled()
     })
-  
+
     it('publish', () => {
       const domainEvents = 'http://example-aggregate-domain-events-kn-channel.default.svc.cluster.local'
       const bus = knativebus({
@@ -146,12 +143,12 @@ describe('knativebus', () => {
         },
         source: 'example-aggregate-model-tests'
       })
-  
+
       const axios = require('axios')
-  
+
       const event = 'example-aggregate.event-happened'
       const data = { id: 1 }
-  
+
       bus.publish(event, data)
       expect(axios).toBeCalledWith({
         method: 'post',

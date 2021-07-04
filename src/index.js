@@ -5,10 +5,10 @@ import axios from 'axios'
 const info = debug('knativebus')
 
 export const knativebus = (config) => {
-  const { 
+  const {
     brokers,
     channels,
-    source, 
+    source
   } = config
 
   return {
