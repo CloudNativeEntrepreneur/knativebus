@@ -18,27 +18,21 @@ Create a broker to send commands to for your aggregate:
 apiVersion: eventing.knative.dev/v1
 kind: Broker
 metadata:
-  name: example
+  name: example-commands
 ```
 
-### Channel
-
-This is configured to use an InMemory Channel. You'll want to use Kafka for production - see the KNative Docs for details.
-
-#### CQRS/ES
-
-Create a channel to publish domain events about your aggregate:
+And a broker to publish domain events about your aggregate:
 
 ```yaml
 apiVersion: messaging.knative.dev/v1
-kind: Channel
+kind: Broker
 metadata:
-  name: example-domain-events
+  name: example-events
 ```
 
 ### Node.js
 
-Then in Node.js, you can use `knativebus` to `publish` events and `send` commands to these brokers and channels by providing a configuration object with the URLs they generate by aggregate name.
+Then in Node.js, you can use `knativebus` to `publish` events and `send` commands to these brokers by providing a configuration object with the URLs they generate by aggregate name.
 
 ```javascript
 import { knativebus } from 'knativebus'
