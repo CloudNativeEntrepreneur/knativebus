@@ -18,7 +18,7 @@ Create a broker to send commands to for your aggregate:
 apiVersion: eventing.knative.dev/v1
 kind: Broker
 metadata:
-  name: example-aggregate
+  name: example
 ```
 
 ### Channel
@@ -33,7 +33,7 @@ Create a channel to publish domain events about your aggregate:
 apiVersion: messaging.knative.dev/v1
 kind: Channel
 metadata:
-  name: example-aggregate-domain-events
+  name: example-domain-events
 ```
 
 ### Node.js
@@ -43,25 +43,22 @@ Then in Node.js, you can use `knativebus` to `publish` events and `send` command
 ```javascript
 import { knativebus } from 'knativebus'
 
-const exampleAggregateBroker = process.env.KNATIVE_EXAMPLE_AGGREGATE_BROKER || 'http://broker-ingress.knative-eventing.svc.cluster.local/test/example-aggregate-model'
-const exampleAggregateDomainEventsChannel = process.env.KNATIVE_EXAMPLE_AGGREGATE_DOMAIN_EVENTS_CHANNEL || 'http://example-aggregate-domain-events-kn-channel.default.svc.cluster.local'
-
 const bus = knativebus({
-  brokers: {
-    'example-aggregate': exampleAggregateBroker
+  aggregates: {
+    example: {
+      commands: 'http://broker-ingress.knative-eventing.svc.cluster.local/default/example-commands',
+      events: 'http://broker-ingress.knative-eventing.svc.cluster.local/default/example-events'
+    }
   },
-  channels: {
-    'example-aggregate': exampleAggregateDomainEventsChannel
-  },
-  source: 'the-name-of-the-service-sending-this-event'
+  source: 'tests'
 })
 
 const run = async () => {
-  // send command to example-aggregate model broker
-  await bus.send('example-aggregate.initialize', { id: 1, name: 'Example 1' })
+  // send command to example commands broker
+  await bus.send('example.initialize', { id: 1, name: 'Example 1' })
 
-  // or publish events (past tense) to a model's event channel
-  await bus.publish('example-aggregate.initialized', { id: 1, name: 'Example 1' })
+  // or publish events (past tense) to a model's events broker
+  await bus.publish('example.initialized', { id: 1, name: 'Example 1' })
 }
 
 run()
