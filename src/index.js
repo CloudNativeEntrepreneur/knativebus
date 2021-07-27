@@ -1,6 +1,9 @@
 import { CloudEvent, HTTP } from 'cloudevents'
 import debug from 'debug'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
+
+axiosRetry(axios)
 
 const info = debug('knativebus')
 
