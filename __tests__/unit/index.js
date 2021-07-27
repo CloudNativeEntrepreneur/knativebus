@@ -1,6 +1,16 @@
 import { knativebus } from 'index'
 
-jest.mock('axios')
+jest.mock('lib/fetch', () => ({
+  fetch: jest.fn(() => new Promise((resolve, reject) => {
+    return resolve({
+      json: jest.fn(() => new Promise((resolve, reject) => {
+        return resolve({
+          data: {}
+        })
+      }))
+    })
+  }))
+}))
 
 const testBusConfig = {
   aggregates: {
@@ -69,8 +79,6 @@ describe('knativebus', () => {
         source: 'tests'
       })
 
-      const axios = require('axios')
-
       const command = 'example.execute'
       const data = { id: 1 }
 
@@ -79,12 +87,10 @@ describe('knativebus', () => {
       } catch (e) {
         expect(e).toEqual(new Error('"example" commands broker url has not been configured'))
       }
-      expect(axios).not.toBeCalled()
     })
 
     it('send invalid command', async () => {
       const bus = knativebus(testBusConfig)
-      const axios = require('axios')
       const command = 'execute'
       const data = { id: 1 }
 
@@ -93,16 +99,15 @@ describe('knativebus', () => {
       } catch (e) {
         expect(e).toEqual(new Error('format commands as {aggregate}.{command}'))
       }
-      expect(axios).not.toBeCalled()
     })
 
-    it('throws an error if aggregate has no config', () => {
+    it('throws an error if aggregate has no config', async () => {
       const bus = knativebus(testBusConfig)
       const command = 'turtle.crawl'
       const data = { id: 1 }
 
       try {
-        bus.send(command, data)
+        await bus.send(command, data)
       } catch (err) {
         expect(err).toEqual(new Error('"turtle" has not been configured'))
       }
@@ -110,17 +115,23 @@ describe('knativebus', () => {
 
     it('send', async () => {
       const bus = knativebus(testBusConfig)
-      const axios = require('axios')
+      const { fetch } = require('lib/fetch')
 
       const command = 'example.execute'
       const data = { id: 1 }
 
       await bus.send(command, data)
-      expect(axios).toBeCalledWith({
-        method: 'post',
-        url: testBusConfig.aggregates.example.commands,
-        data: JSON.stringify(data),
-        headers: expect.any(Object)
+      expect(fetch).toBeCalledWith(testBusConfig.aggregates.example.commands, {
+        body: JSON.stringify(data),
+        method: 'POST',
+        headers: {
+          'ce-id': expect.any(String),
+          'ce-source': 'tests',
+          'ce-specversion': '1.0',
+          'ce-time': expect.any(String),
+          'ce-type': command,
+          "content-type": "application/json; charset=utf-8",
+        }
       })
     })
   })
@@ -136,20 +147,17 @@ describe('knativebus', () => {
       expect(typeof bus.publish === 'function').toBe(true)
     })
 
-    it('publish invalid command', async () => {
+    it('publish invalid event', async () => {
       const bus = knativebus(testBusConfig)
 
-      const axios = require('axios')
-
-      const command = 'executed'
+      const event = 'executed'
       const data = { id: 1 }
 
       try {
-        await bus.publish(command, data)
+        await bus.publish(event, data)
       } catch (e) {
         expect(e).toEqual(new Error('format events as {aggregate}.{event-happened}'))
       }
-      expect(axios).not.toBeCalled()
     })
 
     it('should throw an error if trying to send without aggregate events broker', async () => {
@@ -161,26 +169,23 @@ describe('knativebus', () => {
         source: 'tests'
       })
 
-      const axios = require('axios')
-
       const event = 'example.event-happened'
       const data = { id: 1 }
 
       try {
-        bus.publish(event, data)
+        await bus.publish(event, data)
       } catch (e) {
         expect(e).toEqual(new Error('"example" events broker url has not been configured'))
       }
-      expect(axios).not.toBeCalled()
     })
 
-    it('throws an error if aggregate has no config', () => {
+    it('throws an error if aggregate has no config', async () => {
       const bus = knativebus(testBusConfig)
       const event = 'turtle.crawled'
       const data = { id: 1 }
 
       try {
-        bus.publish(event, data)
+        await bus.publish(event, data)
       } catch (err) {
         expect(err).toEqual(new Error('"turtle" has not been configured'))
       }
@@ -188,18 +193,24 @@ describe('knativebus', () => {
 
     it('publish', () => {
       const bus = knativebus(testBusConfig)
-
-      const axios = require('axios')
+      const { fetch } = require('lib/fetch')
 
       const event = 'example.event-happened'
       const data = { id: 1 }
 
       bus.publish(event, data)
-      expect(axios).toBeCalledWith({
-        method: 'post',
-        url: testBusConfig.aggregates.example.events,
-        data: JSON.stringify(data),
-        headers: expect.any(Object)
+
+      expect(fetch).toBeCalledWith(testBusConfig.aggregates.example.events, {
+        body: JSON.stringify(data),
+        method: 'POST',
+        headers: {
+          'ce-id': expect.any(String),
+          'ce-source': 'tests',
+          'ce-specversion': '1.0',
+          'ce-time': expect.any(String),
+          'ce-type': event,
+          "content-type": "application/json; charset=utf-8",
+        }
       })
     })
   })

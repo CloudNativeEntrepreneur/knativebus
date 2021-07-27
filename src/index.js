@@ -1,8 +1,21 @@
 import { CloudEvent, HTTP } from 'cloudevents'
 import debug from 'debug'
-import axios from 'axios'
+import { fetch } from './lib/fetch.js'
 
 const info = debug('knativebus')
+
+const postCloudEvent = async (url, { body, headers }) => {
+  const fetchResult = await fetch(
+    url,
+    {
+      method: 'POST',
+      body,
+      headers
+    }
+  )
+
+  return await fetchResult.json()
+}
 
 export const knativebus = (config) => {
   const {
@@ -15,7 +28,7 @@ export const knativebus = (config) => {
   if (!source) throw new Error('source is required (what service is sending this message)')
 
   return {
-    publish: (type, data) => {
+    publish: async (type, data) => {
       const splitType = type.split('.')
 
       if (splitType.length < 2) throw new Error('format events as {aggregate}.{event-happened}')
@@ -24,11 +37,11 @@ export const knativebus = (config) => {
       const modelBusConfig = aggregates[model]
       if (!modelBusConfig) throw new Error(`"${model}" has not been configured`)
 
-      const modelDomainEventsChannel = modelBusConfig.events
+      const modelEventsBroker = modelBusConfig.events
 
-      if (!modelDomainEventsChannel) throw new Error(`"${model}" events broker url has not been configured`)
+      if (!modelEventsBroker) throw new Error(`"${model}" events broker url has not been configured`)
       info('publishing event', {
-        type, data, target: modelDomainEventsChannel
+        type, data, target: modelEventsBroker
       })
 
       const ce = new CloudEvent({
@@ -38,16 +51,12 @@ export const knativebus = (config) => {
       })
       const message = HTTP.binary(ce)
 
-      info(`Publishing CloudEvent to KNative domain events channel (${modelDomainEventsChannel}): ${JSON.stringify(ce, null, 2)}`)
+      info(`Publishing CloudEvent to KNative domain events channel (${modelEventsBroker}): ${JSON.stringify(ce, null, 2)}`)
+      info(message)
 
-      return axios({
-        method: 'post',
-        url: modelDomainEventsChannel,
-        data: message.body,
-        headers: message.headers
-      })
+      return postCloudEvent(modelEventsBroker, message)
     },
-    send: (type, data) => {
+    send: async (type, data) => {
       const splitType = type.split('.')
 
       if (splitType.length < 2) throw new Error('format commands as {aggregate}.{command}')
@@ -56,12 +65,12 @@ export const knativebus = (config) => {
       const modelBusConfig = aggregates[model]
       if (!modelBusConfig) throw new Error(`"${model}" has not been configured`)
 
-      const modelBroker = modelBusConfig.commands
+      const modelCommandBroker = modelBusConfig.commands
 
-      if (!modelBroker) throw new Error(`"${model}" commands broker url has not been configured`)
+      if (!modelCommandBroker) throw new Error(`"${model}" commands broker url has not been configured`)
 
       info('publishing command', {
-        type, data, target: modelBroker
+        type, data, target: modelCommandBroker
       })
 
       const ce = new CloudEvent({
@@ -71,14 +80,9 @@ export const knativebus = (config) => {
       })
       const message = HTTP.binary(ce)
 
-      info(`Sending cloud event to KNative model broker (${modelBroker}): ${JSON.stringify(ce, null, 2)}`)
+      info(`Sending cloud event to KNative model broker (${modelCommandBroker}): ${JSON.stringify(ce, null, 2)}`)
 
-      return axios({
-        method: 'post',
-        url: modelBroker,
-        data: message.body,
-        headers: message.headers
-      })
+      return postCloudEvent(modelCommandBroker, message)
     }
   }
 }
