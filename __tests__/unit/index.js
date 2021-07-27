@@ -130,7 +130,7 @@ describe('knativebus', () => {
           'ce-specversion': '1.0',
           'ce-time': expect.any(String),
           'ce-type': command,
-          "content-type": "application/json; charset=utf-8",
+          'content-type': 'application/json; charset=utf-8'
         }
       })
     })
@@ -209,7 +209,7 @@ describe('knativebus', () => {
           'ce-specversion': '1.0',
           'ce-time': expect.any(String),
           'ce-type': event,
-          "content-type": "application/json; charset=utf-8",
+          'content-type': 'application/json; charset=utf-8'
         }
       })
     })
