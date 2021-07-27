@@ -10,7 +10,8 @@ export const knativebus = (config) => {
   const {
     aggregates,
     source,
-    retry = false
+    retry = false,
+    timeout = 0
   } = config
 
   if (!aggregates) throw new Error('aggregates are required')
@@ -52,6 +53,8 @@ export const knativebus = (config) => {
         url: modelDomainEventsChannel,
         data: message.body,
         headers: message.headers
+      }, {
+        timeout
       })
     },
     send: (type, data) => {
@@ -85,7 +88,7 @@ export const knativebus = (config) => {
         url: modelBroker,
         data: message.body,
         headers: message.headers
-      })
+      }, { timeout })
     }
   }
 }

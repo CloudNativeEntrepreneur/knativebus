@@ -109,7 +109,10 @@ describe('knativebus', () => {
     })
 
     it('send', async () => {
-      const bus = knativebus(testBusConfig)
+      const bus = knativebus({
+        ...testBusConfig,
+        timeout: 10
+      })
       const axios = require('axios')
 
       const command = 'example.execute'
@@ -121,7 +124,7 @@ describe('knativebus', () => {
         url: testBusConfig.aggregates.example.commands,
         data: JSON.stringify(data),
         headers: expect.any(Object)
-      })
+      }, { timeout: 10 })
     })
   })
 
@@ -200,7 +203,7 @@ describe('knativebus', () => {
         url: testBusConfig.aggregates.example.events,
         data: JSON.stringify(data),
         headers: expect.any(Object)
-      })
+      }, { timeout: 0 })
     })
 
     it('publish with retry', () => {
@@ -220,7 +223,7 @@ describe('knativebus', () => {
         url: testBusConfig.aggregates.example.events,
         data: JSON.stringify(data),
         headers: expect.any(Object)
-      })
+      }, { timeout: 0 })
     })
   })
 })
