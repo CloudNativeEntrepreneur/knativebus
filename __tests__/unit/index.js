@@ -202,7 +202,7 @@ describe('knativebus', () => {
         headers: expect.any(Object)
       })
     })
-    
+
     it('publish with retry', () => {
       const bus = knativebus({
         ...testBusConfig,
