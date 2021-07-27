@@ -3,19 +3,23 @@ import debug from 'debug'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 
-axiosRetry(axios)
-
 const info = debug('knativebus')
+info('retry enabled')
 
 export const knativebus = (config) => {
   const {
     aggregates,
-    source
+    source,
+    retry = false
   } = config
 
   if (!aggregates) throw new Error('aggregates are required')
   if (Object.keys(aggregates).length === 0) throw new Error('aggregates must contain at least one aggregate key')
   if (!source) throw new Error('source is required (what service is sending this message)')
+
+  if (retry) {
+    axiosRetry(axios)
+  }
 
   return {
     publish: (type, data) => {

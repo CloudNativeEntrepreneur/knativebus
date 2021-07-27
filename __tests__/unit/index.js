@@ -202,5 +202,25 @@ describe('knativebus', () => {
         headers: expect.any(Object)
       })
     })
+    
+    it('publish with retry', () => {
+      const bus = knativebus({
+        ...testBusConfig,
+        retry: true
+      })
+
+      const axios = require('axios')
+
+      const event = 'example.event-happened'
+      const data = { id: 1 }
+
+      bus.publish(event, data)
+      expect(axios).toBeCalledWith({
+        method: 'post',
+        url: testBusConfig.aggregates.example.events,
+        data: JSON.stringify(data),
+        headers: expect.any(Object)
+      })
+    })
   })
 })
