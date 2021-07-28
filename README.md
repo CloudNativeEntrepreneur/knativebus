@@ -44,7 +44,9 @@ const bus = knativebus({
       events: 'http://broker-ingress.knative-eventing.svc.cluster.local/default/example-events'
     }
   },
-  source: 'tests'
+  source: 'tests',
+  retry: true,
+  timeout: 30 * 1000
 })
 
 const run = async () => {
