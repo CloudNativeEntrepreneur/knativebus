@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/CloudNativeEntrepreneur/knativebus#readme",
   "dependencies": {
-    "@babel/runtime": "7.14.8",
+    "@babel/runtime": "7.15.3",
     "axios": "0.21.1",
     "axios-retry": "^3.1.9",
     "cloudevents": "4.0.3",
