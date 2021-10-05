@@ -29,7 +29,7 @@
     "@babel/runtime": "7.15.4",
     "axios": "0.22.0",
     "axios-retry": "^3.1.9",
-    "cloudevents": "4.0.3",
+    "cloudevents": "5.0.0",
     "debug": "4.3.2"
   },
   "devDependencies": {
