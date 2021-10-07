@@ -1,3 +1,4 @@
+[![Release](https://github.com/CloudNativeEntrepreneur/knativebus/actions/workflows/release.yml/badge.svg)](https://github.com/CloudNativeEntrepreneur/knativebus/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/CloudNativeEntrepreneur/knativebus/branch/master/graph/badge.svg?token=Bay2DEb0b7)](https://codecov.io/gh/CloudNativeEntrepreneur/knativebus)
 
 # knativebus
