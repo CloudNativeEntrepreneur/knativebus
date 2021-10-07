@@ -59,3 +59,7 @@ const run = async () => {
 
 run()
 ```
+
+# register-server-handlers
+
+This library works well in conjuction with [register-server-handlers](https://github.com/CloudNativeEntrepreneur/register-server-handlers) for building event driven CQRS/ES microservice systems with KNative.
