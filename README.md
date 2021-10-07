@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/CloudNativeEntrepreneur/knativebus/branch/master/graph/badge.svg?token=Bay2DEb0b7)](https://codecov.io/gh/CloudNativeEntrepreneur/knativebus)
+
 # knativebus
 
 Publish and Send events to KNative via wrapping them in CloudEvents and sending via HTTP Post to the appropriate broker or channel from the config.
