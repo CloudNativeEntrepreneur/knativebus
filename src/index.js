@@ -23,7 +23,7 @@ export const knativebus = (config) => {
   }
 
   return {
-    publish: (type, data) => {
+    publish: async (type, data) => {
       const splitType = type.split('.')
 
       if (splitType.length < 2) throw new Error('format events as {aggregate}.{event-happened}')
@@ -48,7 +48,7 @@ export const knativebus = (config) => {
 
       info(`Publishing CloudEvent to KNative domain events channel (${modelDomainEventsChannel}): ${JSON.stringify(ce, null, 2)}`)
 
-      return axios({
+      const result = await axios({
         method: 'post',
         url: modelDomainEventsChannel,
         data: message.body,
@@ -56,8 +56,10 @@ export const knativebus = (config) => {
       }, {
         timeout
       })
+
+      return result
     },
-    send: (type, data) => {
+    send: async (type, data) => {
       const splitType = type.split('.')
 
       if (splitType.length < 2) throw new Error('format commands as {aggregate}.{command}')
@@ -83,12 +85,14 @@ export const knativebus = (config) => {
 
       info(`Sending cloud event to KNative model broker (${modelBroker}): ${JSON.stringify(ce, null, 2)}`)
 
-      return axios({
+      const result = await axios({
         method: 'post',
         url: modelBroker,
         data: message.body,
         headers: message.headers
       }, { timeout })
+
+      return result
     }
   }
 }

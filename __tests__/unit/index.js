@@ -96,13 +96,13 @@ describe('knativebus', () => {
       expect(axios).not.toBeCalled()
     })
 
-    it('throws an error if aggregate has no config', () => {
+    it('throws an error if aggregate has no config', async () => {
       const bus = knativebus(testBusConfig)
       const command = 'turtle.crawl'
       const data = { id: 1 }
 
       try {
-        bus.send(command, data)
+        await bus.send(command, data)
       } catch (err) {
         expect(err).toEqual(new Error('"turtle" has not been configured'))
       }
@@ -170,26 +170,26 @@ describe('knativebus', () => {
       const data = { id: 1 }
 
       try {
-        bus.publish(event, data)
+        await bus.publish(event, data)
       } catch (e) {
         expect(e).toEqual(new Error('"example" events broker url has not been configured'))
       }
       expect(axios).not.toBeCalled()
     })
 
-    it('throws an error if aggregate has no config', () => {
+    it('throws an error if aggregate has no config', async () => {
       const bus = knativebus(testBusConfig)
       const event = 'turtle.crawled'
       const data = { id: 1 }
 
       try {
-        bus.publish(event, data)
+        await bus.publish(event, data)
       } catch (err) {
         expect(err).toEqual(new Error('"turtle" has not been configured'))
       }
     })
 
-    it('publish', () => {
+    it('publish', async () => {
       const bus = knativebus(testBusConfig)
 
       const axios = require('axios')
@@ -197,7 +197,7 @@ describe('knativebus', () => {
       const event = 'example.event-happened'
       const data = { id: 1 }
 
-      bus.publish(event, data)
+      await bus.publish(event, data)
       expect(axios).toBeCalledWith({
         method: 'post',
         url: testBusConfig.aggregates.example.events,
@@ -206,7 +206,7 @@ describe('knativebus', () => {
       }, { timeout: 0 })
     })
 
-    it('publish with retry', () => {
+    it('publish with retry', async () => {
       const bus = knativebus({
         ...testBusConfig,
         retry: true
@@ -217,7 +217,7 @@ describe('knativebus', () => {
       const event = 'example.event-happened'
       const data = { id: 1 }
 
-      bus.publish(event, data)
+      await bus.publish(event, data)
       expect(axios).toBeCalledWith({
         method: 'post',
         url: testBusConfig.aggregates.example.events,
