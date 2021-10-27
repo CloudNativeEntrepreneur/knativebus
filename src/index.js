@@ -48,7 +48,7 @@ export const knativebus = (config) => {
 
       info(`Publishing CloudEvent to KNative domain events channel (${modelDomainEventsChannel}): ${JSON.stringify(ce, null, 2)}`)
 
-      await axios({
+      const result = await axios({
         method: 'post',
         url: modelDomainEventsChannel,
         data: message.body,
@@ -56,6 +56,8 @@ export const knativebus = (config) => {
       }, {
         timeout
       })
+
+      return result
     },
     send: async (type, data) => {
       const splitType = type.split('.')
@@ -83,12 +85,14 @@ export const knativebus = (config) => {
 
       info(`Sending cloud event to KNative model broker (${modelBroker}): ${JSON.stringify(ce, null, 2)}`)
 
-      await axios({
+      const result = await axios({
         method: 'post',
         url: modelBroker,
         data: message.body,
         headers: message.headers
       }, { timeout })
+
+      return result
     }
   }
 }
