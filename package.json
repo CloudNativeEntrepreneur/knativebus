@@ -30,7 +30,7 @@
     "axios": "0.26.1",
     "axios-retry": "^3.1.9",
     "cloudevents": "5.3.2",
-    "debug": "4.3.4"
+    "debug": "4.3.7"
   },
   "devDependencies": {
     "@babel/cli": "7.17.6",
